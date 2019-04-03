@@ -99,7 +99,7 @@ static void IOSUHAX_disc_io_fsa_close(int fsaFd)
     }
 }
 
-static bool IOSUHAX_sdio_startup(void)
+static bool IOSUHAX_sdio_startup(void* data)
 {
     if(!IOSUHAX_disc_io_fsa_open(FSA_REF_SD))
         return false;
@@ -117,20 +117,20 @@ static bool IOSUHAX_sdio_startup(void)
     return (sdioFd >= 0);
 }
 
-static bool IOSUHAX_sdio_isInserted(void)
+static bool IOSUHAX_sdio_isInserted(void* data)
 {
     //! TODO: check for SD card inserted with IOSUHAX_FSA_GetDeviceInfo()
     return initialized && (fsaFdSd >= 0) && (sdioFd >= 0);
 }
 
-static bool IOSUHAX_sdio_clearStatus(void)
+static bool IOSUHAX_sdio_clearStatus(void* data)
 {
     return true;
 }
 
-static bool IOSUHAX_sdio_shutdown(void)
+static bool IOSUHAX_sdio_shutdown(void* data)
 {
-    if(!IOSUHAX_sdio_isInserted())
+    if(!IOSUHAX_sdio_isInserted(data))
         return false;
 
     IOSUHAX_FSA_RawClose(fsaFdSd, sdioFd);
@@ -139,9 +139,9 @@ static bool IOSUHAX_sdio_shutdown(void)
     return true;
 }
 
-static bool IOSUHAX_sdio_readSectors(uint32_t sector, uint32_t numSectors, void* buffer)
+static bool IOSUHAX_sdio_readSectors(void* data, uint32_t sector, uint32_t numSectors, void* buffer)
 {
-    if(!IOSUHAX_sdio_isInserted())
+    if(!IOSUHAX_sdio_isInserted(data))
         return false;
 
     int res = IOSUHAX_FSA_RawRead(fsaFdSd, buffer, 512, numSectors, sector, sdioFd);
@@ -153,9 +153,9 @@ static bool IOSUHAX_sdio_readSectors(uint32_t sector, uint32_t numSectors, void*
     return true;
 }
 
-static bool IOSUHAX_sdio_writeSectors(uint32_t sector, uint32_t numSectors, const void* buffer)
+static bool IOSUHAX_sdio_writeSectors(void* data, uint32_t sector, uint32_t numSectors, const void* buffer)
 {
-    if(!IOSUHAX_sdio_isInserted())
+    if(!IOSUHAX_sdio_isInserted(data))
         return false;
 
     int res = IOSUHAX_FSA_RawWrite(fsaFdSd, buffer, 512, numSectors, sector, sdioFd);
@@ -176,10 +176,11 @@ const DISC_INTERFACE IOSUHAX_sdio_disc_interface =
     IOSUHAX_sdio_readSectors,
     IOSUHAX_sdio_writeSectors,
     IOSUHAX_sdio_clearStatus,
-    IOSUHAX_sdio_shutdown
+    IOSUHAX_sdio_shutdown,
+    NULL
 };
 
-static bool IOSUHAX_usb_startup(void)
+static bool IOSUHAX_usb_startup(void* data)
 {
     if(!IOSUHAX_disc_io_fsa_open(FSA_REF_USB))
         return false;
@@ -200,19 +201,19 @@ static bool IOSUHAX_usb_startup(void)
     return (usbFd >= 0);
 }
 
-static bool IOSUHAX_usb_isInserted(void)
+static bool IOSUHAX_usb_isInserted(void* data)
 {
     return initialized && (fsaFdUsb >= 0) && (usbFd >= 0);
 }
 
-static bool IOSUHAX_usb_clearStatus(void)
+static bool IOSUHAX_usb_clearStatus(void* data)
 {
     return true;
 }
 
-static bool IOSUHAX_usb_shutdown(void)
+static bool IOSUHAX_usb_shutdown(void* data)
 {
-    if(!IOSUHAX_usb_isInserted())
+    if(!IOSUHAX_usb_isInserted(data))
         return false;
 
     IOSUHAX_FSA_RawClose(fsaFdUsb, usbFd);
@@ -221,9 +222,9 @@ static bool IOSUHAX_usb_shutdown(void)
     return true;
 }
 
-static bool IOSUHAX_usb_readSectors(uint32_t sector, uint32_t numSectors, void* buffer)
+static bool IOSUHAX_usb_readSectors(void* data, uint32_t sector, uint32_t numSectors, void* buffer)
 {
-    if(!IOSUHAX_usb_isInserted())
+    if(!IOSUHAX_usb_isInserted(data))
         return false;
 
     int res = IOSUHAX_FSA_RawRead(fsaFdUsb, buffer, 512, numSectors, sector, usbFd);
@@ -235,9 +236,9 @@ static bool IOSUHAX_usb_readSectors(uint32_t sector, uint32_t numSectors, void* 
     return true;
 }
 
-static bool IOSUHAX_usb_writeSectors(uint32_t sector, uint32_t numSectors, const void* buffer)
+static bool IOSUHAX_usb_writeSectors(void* data, uint32_t sector, uint32_t numSectors, const void* buffer)
 {
-    if(!IOSUHAX_usb_isInserted())
+    if(!IOSUHAX_usb_isInserted(data))
         return false;
 
     int res = IOSUHAX_FSA_RawWrite(fsaFdUsb, buffer, 512, numSectors, sector, usbFd);
@@ -258,5 +259,6 @@ const DISC_INTERFACE IOSUHAX_usb_disc_interface =
     IOSUHAX_usb_readSectors,
     IOSUHAX_usb_writeSectors,
     IOSUHAX_usb_clearStatus,
-    IOSUHAX_usb_shutdown
+    IOSUHAX_usb_shutdown,
+    NULL
 };

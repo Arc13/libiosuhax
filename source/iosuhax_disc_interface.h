@@ -42,12 +42,12 @@ typedef uint32_t sec_t;
 #define FEATURE_MEDIUM_CANREAD      0x00000001
 #define FEATURE_MEDIUM_CANWRITE     0x00000002
 
-typedef bool (* FN_MEDIUM_STARTUP)(void) ;
-typedef bool (* FN_MEDIUM_ISINSERTED)(void) ;
-typedef bool (* FN_MEDIUM_READSECTORS)(uint32_t sector, uint32_t numSectors, void* buffer) ;
-typedef bool (* FN_MEDIUM_WRITESECTORS)(uint32_t sector, uint32_t numSectors, const void* buffer) ;
-typedef bool (* FN_MEDIUM_CLEARSTATUS)(void) ;
-typedef bool (* FN_MEDIUM_SHUTDOWN)(void) ;
+typedef bool (* FN_MEDIUM_STARTUP)(void* data) ;
+typedef bool (* FN_MEDIUM_ISINSERTED)(void* data) ;
+typedef bool (* FN_MEDIUM_READSECTORS)(void* data, uint32_t sector, uint32_t numSectors, void* buffer) ;
+typedef bool (* FN_MEDIUM_WRITESECTORS)(void* data, uint32_t sector, uint32_t numSectors, const void* buffer) ;
+typedef bool (* FN_MEDIUM_CLEARSTATUS)(void* data) ;
+typedef bool (* FN_MEDIUM_SHUTDOWN)(void* data) ;
 
 struct DISC_INTERFACE_STRUCT {
 	unsigned long			ioType ;
@@ -58,6 +58,7 @@ struct DISC_INTERFACE_STRUCT {
 	FN_MEDIUM_WRITESECTORS	writeSectors ;
 	FN_MEDIUM_CLEARSTATUS	clearStatus ;
 	FN_MEDIUM_SHUTDOWN		shutdown ;
+	void*					data ;
 } ;
 
 typedef struct DISC_INTERFACE_STRUCT DISC_INTERFACE ;
